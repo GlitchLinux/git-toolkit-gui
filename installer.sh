@@ -10,6 +10,9 @@ wget https://raw.githubusercontent.com/GlitchLinux/git-toolkit-gui/refs/heads/ma
 sudo cp toolkit-launcher.sh /usr/local/bin/toolkit-launcher.sh
 wget https://github.com/GlitchLinux/git-toolkit-gui/blob/main/git-toolkit-gui.png
 sudo mv git-toolkit-gui.png /usr/share/icons/git-toolkit-gui.png
+wget https://raw.githubusercontent.com/GlitchLinux/git-toolkit-gui/refs/heads/main/git-toolkit-gui.desktop
+sudo mv git-toolkit-gui.desktop /usr/share/applications/git-toolkit-gui.desktop
+sudo chmod +x /usr/share/applications/git-toolkit-gui.desktop
 
 echo '#!/bin/bash' > /tmp/apps-gui
 echo 'python3 /usr/local/bin/glitch-toolkit-gui.py 2>&1 &' >> /tmp/apps-gui
