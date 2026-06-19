@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo rm -rf /tmp/apps-gui /tmp/apps-cli-restore /tmp/apps-gui-restore /tmp/glitch-toolkit-gui.py /tmp/toolkit-launcher.sh
+sudo rm -f /tmp/apps-gui /tmp/apps-cli-restore /tmp/apps-gui-restore /tmp/glitch-toolkit-gui.py /tmp/toolkit-launcher.sh
 
 sudo cp -f /usr/local/bin/apps /usr/local/bin/apps-cli
 
