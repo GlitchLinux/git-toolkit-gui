@@ -1,8 +1,8 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=Git-Toolkit-GUI
+Name=Gui-Toolkit
 Exec=/usr/local/bin/toolkit-launcher.sh
-Icon=/usr/share/icons/git-toolkit-gui.png
+Icon=/usr/share/icons/gui-toolkit-128x128.png
 Terminal=false
 Categories=Utility;
