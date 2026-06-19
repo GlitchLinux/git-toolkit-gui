@@ -6,6 +6,8 @@ sudo rm -f /tmp/apps-gui-restore
 sudo rm -f /tmp/glitch-toolkit-gui.py 
 sudo rm -f /tmp/toolkit-launcher.sh
 
+sudo rm -f /usr/share/applications/Glitch-Toolkit.desktop
+
 sudo cp -f /usr/local/bin/apps /usr/local/bin/apps-cli
 
 cd /tmp && wget https://raw.githubusercontent.com/GlitchLinux/git-toolkit-gui/refs/heads/main/glitch-toolkit-gui.py
