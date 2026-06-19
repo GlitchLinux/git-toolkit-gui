@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-gLiTcH-ToolKit GUI - PyQt5 launcher for the gLiTcH-ToolKit repo.
+Glitch-Toolkit GUI - PyQt5 launcher for the Glitch-ToolKit repo.
 Browse, search, run, copy, and export scripts with a compact dark UI.
 """
 
@@ -339,10 +339,9 @@ class ToolKitWindow(QMainWindow):
         self.sudo_mode = False
         self.spawned = []  # list of (Popen, script_name, timestamp)
 
-        self.setWindowTitle("gLiTcH-ToolKit")
+        self.setWindowTitle("Glitch-Toolkit")
         self.resize(520, 420)
         self.setMinimumSize(340, 260)
-        self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
 
         self._build_ui()
         self._apply_theme()
@@ -904,41 +903,92 @@ class ToolKitWindow(QMainWindow):
         if idx < len(self.spawned):
             proc, name, ts = self.spawned[idx]
             if proc.poll() is None:
+                pid = proc.pid
+                # Kill process group first
                 try:
-                    # Kill the process group (terminal + child scripts)
-                    os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
-                except (ProcessLookupError, PermissionError):
-                    try:
-                        proc.terminate()
-                    except Exception:
-                        pass
-                # Also try sudo kill for elevated scripts
+                    os.killpg(os.getpgid(pid), signal.SIGTERM)
+                except (ProcessLookupError, PermissionError, OSError):
+                    pass
+                try:
+                    proc.terminate()
+                except Exception:
+                    pass
+                # Sudo kill for elevated child processes
                 try:
                     subprocess.run(
-                        ["sudo", "kill", "-TERM", str(proc.pid)],
+                        ["sudo", "kill", "-9", str(pid)],
                         capture_output=True, timeout=3
                     )
                 except Exception:
                     pass
+                # Kill any orphaned child processes by PPID
+                self._kill_children(pid)
                 self.status_label.setText(f"Killed: {name}")
             self._poll_processes()
+
+    def _kill_children(self, ppid):
+        """Find and kill child processes by parent PID."""
+        try:
+            result = subprocess.run(
+                ["pgrep", "-P", str(ppid)],
+                capture_output=True, text=True, timeout=3
+            )
+            for child_pid in result.stdout.strip().split("\n"):
+                if child_pid.strip():
+                    try:
+                        os.kill(int(child_pid), signal.SIGKILL)
+                    except (ProcessLookupError, PermissionError):
+                        subprocess.run(
+                            ["sudo", "kill", "-9", child_pid.strip()],
+                            capture_output=True, timeout=3
+                        )
+        except Exception:
+            pass
 
     def _kill_all_procs(self):
         """Kill all running processes."""
         killed = 0
         for proc, name, ts in self.spawned:
             if proc.poll() is None:
+                pid = proc.pid
                 try:
-                    os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
-                except (ProcessLookupError, PermissionError):
-                    try:
-                        proc.terminate()
-                    except Exception:
-                        pass
+                    os.killpg(os.getpgid(pid), signal.SIGTERM)
+                except (ProcessLookupError, PermissionError, OSError):
+                    pass
+                try:
+                    proc.terminate()
+                except Exception:
+                    pass
+                self._kill_children(pid)
                 killed += 1
         self.status_label.setText(f"Killed {killed} process(es)")
-        # Give them a moment to die, then update
-        QTimer.singleShot(500, self._poll_processes)
+        # Give SIGTERM a moment, then force-kill terminals
+        QTimer.singleShot(500, self._force_kill_terminals)
+
+    def _force_kill_terminals(self):
+        """SIGKILL any surviving spawned PIDs and their terminal processes."""
+        term = resolve_terminal(self.settings)
+        for proc, name, ts in self.spawned:
+            if proc.poll() is None:
+                pid = proc.pid
+                # SIGKILL the process group
+                try:
+                    os.killpg(os.getpgid(pid), signal.SIGKILL)
+                except (ProcessLookupError, PermissionError, OSError):
+                    pass
+                try:
+                    proc.kill()
+                except Exception:
+                    pass
+                # Sudo kill as last resort
+                try:
+                    subprocess.run(
+                        ["sudo", "kill", "-9", str(pid)],
+                        capture_output=True, timeout=3
+                    )
+                except Exception:
+                    pass
+        self._poll_processes()
 
     def _clean_dead_procs(self):
         """Remove finished processes from the tracking list."""
@@ -952,20 +1002,32 @@ class ToolKitWindow(QMainWindow):
     def _nuke_all_procs(self):
         """Kill everything and clean the list."""
         self._kill_all_procs()
-        # Wait a bit for kills to take effect, then wipe
-        QTimer.singleShot(800, self._force_clean_all)
+        # Wait for force-kill, then wipe the list
+        QTimer.singleShot(1200, self._force_clean_all)
 
     def _force_clean_all(self):
         """Force-kill any survivors and clear the list."""
+        term = resolve_terminal(self.settings)
         for proc, name, ts in self.spawned:
             if proc.poll() is None:
                 try:
                     os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
-                except (ProcessLookupError, PermissionError):
-                    try:
-                        proc.kill()
-                    except Exception:
-                        pass
+                except (ProcessLookupError, PermissionError, OSError):
+                    pass
+                try:
+                    proc.kill()
+                except Exception:
+                    pass
+        # Nuclear option: pkill the terminal binary for any orphans
+        # Only kill terminals spawned by our PID to avoid killing user terminals
+        my_pid = os.getpid()
+        try:
+            subprocess.run(
+                ["pkill", "-9", "-P", str(my_pid), term],
+                capture_output=True, timeout=3
+            )
+        except Exception:
+            pass
         self.spawned.clear()
         self._update_proc_btn()
         self.status_label.setText("All processes terminated")
@@ -1115,7 +1177,7 @@ class ToolKitWindow(QMainWindow):
 # ---------------------------------------------------------------------------
 def main():
     app = QApplication(sys.argv)
-    app.setApplicationName("gLiTcH-ToolKit")
+    app.setApplicationName("Glitch-Toolkit")
     win = ToolKitWindow()
     win.show()
     sys.exit(app.exec_())
