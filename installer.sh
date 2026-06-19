@@ -19,6 +19,8 @@ sudo mv gui-toolkit.png /usr/share/icons/git-toolkit-gui.png
 wget https://raw.githubusercontent.com/GlitchLinux/git-toolkit-gui/refs/heads/main/git-toolkit-gui.desktop
 sudo mv git-toolkit-gui.desktop /usr/share/applications/git-toolkit-gui.desktop
 sudo chmod +x /usr/share/applications/git-toolkit-gui.desktop
+sudo cp /usr/share/applications/git-toolkit-gui.desktop /usr/share/applications/Glitch-Toolkit.desktop
+sudo chmod +x /usr/share/applications/Glitch-Toolkit.desktop
 
 sudo mv /usr/share/icons/grey-glitch.png /usr/share/icons/git-toolkit-gui.png
 
