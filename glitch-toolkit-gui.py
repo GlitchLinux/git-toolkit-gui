@@ -339,7 +339,7 @@ class ToolKitWindow(QMainWindow):
         self.setWindowTitle("Glitch-Toolkit")
         self.resize(520, 420)
         self.setMinimumSize(340, 260)
-        #self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
+        # self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
 
         self._build_ui()
         self._apply_theme()
