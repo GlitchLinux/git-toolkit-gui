@@ -15,7 +15,7 @@ sudo mv git-toolkit-gui.desktop /usr/share/applications/git-toolkit-gui.desktop
 sudo chmod +x /usr/share/applications/git-toolkit-gui.desktop
 
 echo '#!/bin/bash' > /tmp/apps-gui
-echo 'python3 /usr/local/bin/glitch-toolkit-gui.py 2>&1 &' >> /tmp/apps-gui
+echo "python3 /usr/local/bin/glitch-toolkit-gui.py 2>&1 &" >> /tmp/apps-gui
 sudo mv /tmp/apps-gui /usr/local/bin/ && sudo cp /usr/local/bin/apps-gui /usr/local/bin/apps
 sudo chmod +x /usr/local/bin/glitch-toolkit-gui.py
 sudo chmod +x /usr/local/bin/toolkit-launcher.sh
@@ -23,13 +23,13 @@ sudo chmod +x /usr/local/bin/apps && sudo chmod +x /usr/local/bin/apps-gui
 
 echo '#!/bin/bash' > /tmp/apps-cli-restore
 echo "sudo cp /usr/local/bin/apps-cli /usr/local/bin/apps" >> /tmp/apps-cli-restore
-echo "echo '"apps" shortcut restored to CLI toolkit'" >> /tmp/apps-cli-restore
+echo "echo 'apps' shortcut restored to CLI toolkit" >> /tmp/apps-cli-restore
 sudo cp /tmp/apps-cli-restore /usr/local/bin/apps-cli-restore
 sudo chmod +x /usr/local/bin/apps-cli-restore
 
 echo '#!/bin/bash' > /tmp/apps-gui-restore
 echo "sudo cp /usr/local/bin/apps-gui /usr/local/bin/apps" >> /tmp/apps-gui-restore
-echo "echo '"apps" shortcut restored to GUI toolkit'" >> /tmp/apps-gui-restore
+echo "echo 'apps' shortcut restored to GUI toolkit" >> /tmp/apps-gui-restore
 sudo cp /tmp/apps-gui-restore /usr/local/bin/apps-gui-restore
 sudo chmod +x /usr/local/bin/apps-gui-restore
 
@@ -43,3 +43,9 @@ echo "OR change back 'apps' shortcut to execute GUI toolkit with 'apps-gui-resto
 
 cat /tmp/finished | borderize
 sudo rm /tmp/finished
+
+sudo rm -f /tmp/apps-gui 
+sudo rm -f /tmp/apps-cli-restore 
+sudo rm -f /tmp/apps-gui-restore 
+sudo rm -f /tmp/glitch-toolkit-gui.py 
+sudo rm -f /tmp/toolkit-launcher.sh
