@@ -11,7 +11,7 @@ echo '#!/bin/bash' > /tmp/apps-gui
 echo 'python3 /usr/local/bin/glitch-toolkit-gui.py 2>&1 &' >> /tmp/apps-gui
 sudo mv /tmp/apps-gui /usr/local/bin/ && sudo cp /usr/local/bin/apps-gui /usr/local/bin/apps
 sudo chmod +x /usr/local/bin/glitch-toolkit-gui.py
-suso chmod +x /usr/local/bin/toolkit-launcher.sh
+sudo chmod +x /usr/local/bin/toolkit-launcher.sh
 sudo chmod +x /usr/local/bin/apps && sudo chmod +x /usr/local/bin/apps-gui
 
 echo '#!/bin/bash' > /tmp/apps-cli-restore
