@@ -7,7 +7,8 @@ sudo rm -f /tmp/glitch-toolkit-gui.py
 sudo rm -f /tmp/toolkit-launcher.sh
 
 sudo rm -f /usr/share/applications/Glitch-Toolkit.desktop
-sudo mv /usr/share/icons/grey-glitch.png /usr/share/icons/alien.png
+sudo rm -f /usr/share/icons/grey-glitch.png
+sudo rm -f /home/x/.local/share/plasma_icons/*
 
 sudo cp -f /usr/local/bin/apps /usr/local/bin/apps-cli
 
