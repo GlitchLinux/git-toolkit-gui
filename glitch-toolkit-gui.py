@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-gLiTcH-ToolKit GUI - PyQt5 launcher for the gLiTcH-ToolKit repo.
+Glitch-Toolkit GUI - PyQt5 launcher for the Glitch-Toolkit repo.
 Browse, search, run, copy, and export scripts with a compact dark UI.
 """
 
@@ -359,7 +359,7 @@ class ToolKitWindow(QMainWindow):
         self.sudo_mode = False
         self.spawned = []  # list of (Popen, script_name, timestamp)
 
-        self.setWindowTitle("gLiTcH-ToolKit")
+        self.setWindowTitle("Glitch-Toolkit")
         self.resize(520, 420)
         self.setMinimumSize(340, 260)
 
@@ -1203,7 +1203,7 @@ class ToolKitWindow(QMainWindow):
 # ---------------------------------------------------------------------------
 def main():
     app = QApplication(sys.argv)
-    app.setApplicationName("gLiTcH-ToolKit")
+    app.setApplicationName("Glitch-Toolkit")
     win = ToolKitWindow()
     win.show()
     sys.exit(app.exec_())
