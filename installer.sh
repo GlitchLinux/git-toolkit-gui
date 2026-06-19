@@ -1,5 +1,7 @@
 #!/bin/bash
 
+sudo rm -rf /tmp/apps-gui /tmp/apps-cli-restore /tmp/apps-gui-restore /tmp/glitch-toolkit-gui.py /tmp/toolkit-launcher.sh
+
 sudo cp -f /usr/local/bin/apps /usr/local/bin/apps-cli
 
 cd /tmp && wget https://raw.githubusercontent.com/GlitchLinux/git-toolkit-gui/refs/heads/main/glitch-toolkit-gui.py
@@ -32,5 +34,3 @@ echo "Glitch GUI-toolkit can now be launched with 'apps' & 'apps-gui' commands"
 
 echo "To Change back 'apps' shortcut to execute CLI toolkit run 'apps-cli-restore'"
 echo "OR change back 'apps' shortcut to execute GUI toolkit with 'apps-gui-restore'"
-
-
