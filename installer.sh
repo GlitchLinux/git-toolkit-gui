@@ -1,6 +1,10 @@
 #!/bin/bash
 
-sudo rm -f /tmp/apps-gui /tmp/apps-cli-restore /tmp/apps-gui-restore /tmp/glitch-toolkit-gui.py /tmp/toolkit-launcher.sh
+sudo rm -f /tmp/apps-gui 
+sudo rm -f /tmp/apps-cli-restore 
+sudo rm -f /tmp/apps-gui-restore 
+sudo rm -f /tmp/glitch-toolkit-gui.py 
+sudo rm -f /tmp/toolkit-launcher.sh
 
 sudo cp -f /usr/local/bin/apps /usr/local/bin/apps-cli
 
@@ -35,11 +39,11 @@ sudo chmod +x /usr/local/bin/apps-gui-restore
 
 echo "Glitch CLI-tookit changed to 'apps-cli' shortcut" > /tmp/finished
 echo "" >> /tmp/finished
-echo "Glitch GUI-toolkit can now be launched with 'apps' & 'apps-gui' commands" >> /tmp/finished
+echo "Glitch GUI-toolkit can now be launched with "apps" & "apps-gui" commands" >> /tmp/finished
 echo "" >> /tmp/finished
-echo "To Change back 'apps' shortcut to execute CLI toolkit run 'apps-cli-restore'" >> /tmp/finished
+echo "To Change back "apps" shortcut to execute CLI toolkit run "apps-cli-restore"" >> /tmp/finished
 echo "" >> /tmp/finished
-echo "OR change back 'apps' shortcut to execute GUI toolkit with 'apps-gui-restore'" >> /tmp/finished
+echo "OR change back "apps" shortcut to execute GUI toolkit with "apps-gui-restore"" >> /tmp/finished
 
 cat /tmp/finished | borderize
 sudo rm /tmp/finished
