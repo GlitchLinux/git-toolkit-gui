@@ -37,7 +37,7 @@ APP_ICON_64  = 'iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAHYAAAB
 REPO_URL  = "https://github.com/GlitchLinux/gLiTcH-ToolKit.git"
 REPO_DIR  = Path("/tmp/gLiTcH-ToolKit")
 ICON_DIR  = Path("/tmp/toolkit-icons")
-ICON_URL  = "https://glitchlinux.wtf/FILES/toolkit-icons"
+ICON_URL  = "https://github.com/GlitchLinux/git-toolkit-gui/tree/main/toolkit-icons"
 ICON_LIST = [
     "txt.png", "terminal-w.png", "sh.png", "py.png", "pf2.png",
     "iso_file.png", "file.png", "exe.png", "cfg.png", "c.png", "bin.png",
