@@ -10,6 +10,8 @@ import json
 import subprocess
 import threading
 import shutil
+import time
+import signal
 from pathlib import Path
 
 from PyQt5.QtWidgets import (
@@ -335,14 +337,20 @@ class ToolKitWindow(QMainWindow):
         self.settings = Settings()
         self.tools = []
         self.sudo_mode = False
+        self.spawned = []  # list of (Popen, script_name, timestamp)
 
-        self.setWindowTitle("Glitch-Toolkit")
+        self.setWindowTitle("gLiTcH-ToolKit")
         self.resize(520, 420)
         self.setMinimumSize(340, 260)
-        # self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
 
         self._build_ui()
         self._apply_theme()
+
+        # Poll child processes every 2 seconds
+        self._proc_timer = QTimer(self)
+        self._proc_timer.timeout.connect(self._poll_processes)
+        self._proc_timer.start(2000)
         self._setup_shortcuts()
         self._ensure_icons()
         self._sync_repo_bg()
@@ -392,6 +400,13 @@ class ToolKitWindow(QMainWindow):
         self.refresh_btn.setToolTip("Refresh repo  [Ctrl+R]")
         self.refresh_btn.clicked.connect(self._sync_repo_bg)
         top.addWidget(self.refresh_btn)
+
+        self.proc_btn = QPushButton("\u25cf 0")
+        self.proc_btn.setFixedWidth(52)
+        self.proc_btn.setToolTip("Running processes - click to manage")
+        self.proc_btn.clicked.connect(self._show_proc_menu)
+        self.proc_btn.setVisible(False)  # hidden when 0 processes
+        top.addWidget(self.proc_btn)
 
         layout.addLayout(top)
 
@@ -727,6 +742,7 @@ class ToolKitWindow(QMainWindow):
         wrapped = (f'{shell_cmd}; echo ""; '
                    f'echo -e "\\033[0;36mPress Enter to close...\\033[0m"; read')
 
+        proc = None
         try:
             env = os.environ.copy()
 
@@ -739,7 +755,7 @@ class ToolKitWindow(QMainWindow):
                 elif launch == "small":
                     args.extend(["--geometry", "80x24"])
                 args.extend(["-e", f"bash -c '{wrapped}'"])
-                subprocess.Popen(args, env=env)
+                proc = subprocess.Popen(args, env=env, start_new_session=True)
 
             elif term == "gnome-terminal":
                 args = [term]
@@ -750,7 +766,7 @@ class ToolKitWindow(QMainWindow):
                 elif launch == "minimized":
                     args.extend(["--geometry", "80x24"])
                 args.extend(["--", "bash", "-c", wrapped])
-                subprocess.Popen(args, env=env)
+                proc = subprocess.Popen(args, env=env, start_new_session=True)
 
             elif term == "konsole":
                 args = [term, "--hold"]
@@ -759,7 +775,7 @@ class ToolKitWindow(QMainWindow):
                 elif launch == "small":
                     args.extend(["--geometry", "80x24"])
                 args.extend(["-e", "bash", "-c", wrapped])
-                subprocess.Popen(args, env=env)
+                proc = subprocess.Popen(args, env=env, start_new_session=True)
 
             elif term == "alacritty":
                 args = [term]
@@ -767,7 +783,7 @@ class ToolKitWindow(QMainWindow):
                     args.extend(["-o", "window.dimensions.columns=80",
                                  "-o", "window.dimensions.lines=24"])
                 args.extend(["-e", "bash", "-c", wrapped])
-                subprocess.Popen(args, env=env)
+                proc = subprocess.Popen(args, env=env, start_new_session=True)
 
             elif term == "kitty":
                 args = [term]
@@ -776,7 +792,7 @@ class ToolKitWindow(QMainWindow):
                 elif launch == "minimized":
                     args.extend(["--start-as", "minimized"])
                 args.extend(["-e", "bash", "-c", wrapped])
-                subprocess.Popen(args, env=env)
+                proc = subprocess.Popen(args, env=env, start_new_session=True)
 
             else:
                 # xterm and others
@@ -788,10 +804,171 @@ class ToolKitWindow(QMainWindow):
                 elif launch == "small":
                     args.extend(["-geometry", "80x24"])
                 args.extend(["-e", f"bash -c '{wrapped}'"])
-                subprocess.Popen(args, env=env)
+                proc = subprocess.Popen(args, env=env, start_new_session=True)
+
+            if proc:
+                self.spawned.append((proc, name, time.time()))
+                self._update_proc_btn()
 
         except Exception as e:
             QMessageBox.warning(self, "Error", f"Failed to launch:\n{e}")
+
+    # ----- Process tracking ------------------------------------------------
+    def _poll_processes(self):
+        """Check for exited processes and update the indicator."""
+        if not self.spawned:
+            return
+        # poll() returns None if still running, exit code if done
+        for proc, name, ts in self.spawned:
+            proc.poll()
+        self._update_proc_btn()
+
+    def _update_proc_btn(self):
+        """Update the process button label and visibility."""
+        alive = sum(1 for p, n, t in self.spawned if p.poll() is None)
+        dead  = sum(1 for p, n, t in self.spawned if p.poll() is not None)
+        total = len(self.spawned)
+
+        if total == 0:
+            self.proc_btn.setVisible(False)
+            return
+
+        self.proc_btn.setVisible(True)
+
+        if alive > 0 and dead > 0:
+            self.proc_btn.setText(f"\u25cf {alive}  \u2717 {dead}")
+            self.proc_btn.setToolTip(
+                f"{alive} running, {dead} finished - click to manage")
+        elif alive > 0:
+            self.proc_btn.setText(f"\u25cf {alive}")
+            self.proc_btn.setToolTip(f"{alive} running - click to manage")
+        else:
+            self.proc_btn.setText(f"\u2717 {dead}")
+            self.proc_btn.setToolTip(f"{dead} finished - click to clean up")
+
+        # Color the button: green if all alive, red if any dead, yellow if mixed
+        if dead > 0 and alive > 0:
+            self.proc_btn.setStyleSheet(
+                "QPushButton { color: #ffcc00; border-color: #ffcc00; }")
+        elif dead > 0:
+            self.proc_btn.setStyleSheet(
+                "QPushButton { color: #ff4444; border-color: #ff4444; }")
+        else:
+            self.proc_btn.setStyleSheet(
+                "QPushButton { color: #00ff0b; border-color: #00ff0b; }")
+
+    def _show_proc_menu(self):
+        """Show a menu listing all tracked processes with kill/clean options."""
+        menu = QMenu(self)
+
+        alive_items = []
+        dead_items = []
+
+        for i, (proc, name, ts) in enumerate(self.spawned):
+            elapsed = int(time.time() - ts)
+            mins, secs = divmod(elapsed, 60)
+            time_str = f"{mins}m{secs:02d}s" if mins else f"{secs}s"
+
+            if proc.poll() is None:
+                # Still running
+                act = menu.addAction(f"\u25cf  {name}  [{time_str}]  -  Kill")
+                act.triggered.connect(lambda checked, idx=i: self._kill_proc(idx))
+                alive_items.append(i)
+            else:
+                act = menu.addAction(f"\u2717  {name}  [{time_str}]  -  exited")
+                act.setEnabled(False)
+                dead_items.append(i)
+
+        if alive_items or dead_items:
+            menu.addSeparator()
+
+        if alive_items:
+            act_kill_all = menu.addAction(
+                f"\u2620  Kill all running  ({len(alive_items)})")
+            act_kill_all.triggered.connect(self._kill_all_procs)
+
+        if dead_items:
+            act_clean = menu.addAction(
+                f"\u2702  Clean finished  ({len(dead_items)})")
+            act_clean.triggered.connect(self._clean_dead_procs)
+
+        if alive_items or dead_items:
+            act_nuke = menu.addAction("\u26a0  Kill all + Clean")
+            act_nuke.triggered.connect(self._nuke_all_procs)
+
+        menu.exec_(self.proc_btn.mapToGlobal(
+            self.proc_btn.rect().bottomLeft()))
+
+    def _kill_proc(self, idx):
+        """Kill a single process and its children."""
+        if idx < len(self.spawned):
+            proc, name, ts = self.spawned[idx]
+            if proc.poll() is None:
+                try:
+                    # Kill the process group (terminal + child scripts)
+                    os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+                except (ProcessLookupError, PermissionError):
+                    try:
+                        proc.terminate()
+                    except Exception:
+                        pass
+                # Also try sudo kill for elevated scripts
+                try:
+                    subprocess.run(
+                        ["sudo", "kill", "-TERM", str(proc.pid)],
+                        capture_output=True, timeout=3
+                    )
+                except Exception:
+                    pass
+                self.status_label.setText(f"Killed: {name}")
+            self._poll_processes()
+
+    def _kill_all_procs(self):
+        """Kill all running processes."""
+        killed = 0
+        for proc, name, ts in self.spawned:
+            if proc.poll() is None:
+                try:
+                    os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
+                except (ProcessLookupError, PermissionError):
+                    try:
+                        proc.terminate()
+                    except Exception:
+                        pass
+                killed += 1
+        self.status_label.setText(f"Killed {killed} process(es)")
+        # Give them a moment to die, then update
+        QTimer.singleShot(500, self._poll_processes)
+
+    def _clean_dead_procs(self):
+        """Remove finished processes from the tracking list."""
+        before = len(self.spawned)
+        self.spawned = [(p, n, t) for p, n, t in self.spawned
+                        if p.poll() is None]
+        cleaned = before - len(self.spawned)
+        self.status_label.setText(f"Cleaned {cleaned} finished process(es)")
+        self._update_proc_btn()
+
+    def _nuke_all_procs(self):
+        """Kill everything and clean the list."""
+        self._kill_all_procs()
+        # Wait a bit for kills to take effect, then wipe
+        QTimer.singleShot(800, self._force_clean_all)
+
+    def _force_clean_all(self):
+        """Force-kill any survivors and clear the list."""
+        for proc, name, ts in self.spawned:
+            if proc.poll() is None:
+                try:
+                    os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+                except (ProcessLookupError, PermissionError):
+                    try:
+                        proc.kill()
+                    except Exception:
+                        pass
+        self.spawned.clear()
+        self._update_proc_btn()
+        self.status_label.setText("All processes terminated")
 
     # ----- Toggles ---------------------------------------------------------
     def _toggle_sudo(self):
