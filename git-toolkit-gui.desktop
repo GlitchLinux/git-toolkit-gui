@@ -1,8 +1,8 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=GLitch GUI Toolkit
+Name=Git-Toolkit GUI
 Exec=/usr/local/bin/toolkit-launcher.sh
-Icon=/usr/share/icons/grey-glitch.png
+Icon=/usr/share/icons/git-toolkit-gui.png
 Terminal=false
 Categories=Utility;
