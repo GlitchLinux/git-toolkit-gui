@@ -26,10 +26,10 @@ sudo mv /usr/share/icons/grey-glitch.png /usr/share/icons/git-toolkit-gui.png
 
 echo '#!/bin/bash' > /tmp/apps-gui
 echo "python3 /usr/local/bin/glitch-toolkit-gui.py 2>&1 &" >> /tmp/apps-gui
-sudo mv /tmp/apps-gui /usr/local/bin/ && sudo cp /usr/local/bin/apps-gui /usr/local/bin/apps
+sudo mv /tmp/apps-gui /usr/local/bin/ && sudo chmod 777 /usr/local/bin/apps-gui 
 sudo chmod +x /usr/local/bin/glitch-toolkit-gui.py
 sudo chmod +x /usr/local/bin/toolkit-launcher.sh
-sudo chmod +x /usr/local/bin/apps && sudo chmod +x /usr/local/bin/apps-gui
+sudo chmod +x /usr/local/bin/apps-gui && sudo chmod +x /usr/local/bin/apps-gui
 
 echo '#!/bin/bash' > /tmp/apps-cli-restore
 echo "sudo cp /usr/local/bin/apps-cli /usr/local/bin/apps" >> /tmp/apps-cli-restore
