@@ -1,7 +1,7 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=GUI-Toolkit
+Name=GLitch GUI Toolkit
 Exec=/usr/local/bin/toolkit-launcher.sh
 Icon=/usr/share/icons/grey-glitch.png
 Terminal=false
