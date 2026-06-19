@@ -359,7 +359,7 @@ class ToolKitWindow(QMainWindow):
         self.sudo_mode = False
         self.spawned = []  # list of (Popen, script_name, timestamp)
 
-        self.setWindowTitle("gLiTcH-ToolKit")
+        self.setWindowTitle("Glitch-Toolkit")
         self.resize(520, 420)
         self.setMinimumSize(340, 260)
 
@@ -1203,7 +1203,7 @@ class ToolKitWindow(QMainWindow):
 # ---------------------------------------------------------------------------
 def main():
     app = QApplication(sys.argv)
-    app.setApplicationName("gLiTcH-ToolKit")
+    app.setApplicationName("Glitch-Toolkit")
     win = ToolKitWindow()
     win.show()
     sys.exit(app.exec_())
