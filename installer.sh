@@ -11,23 +11,24 @@ sudo mv /tmp/apps-gui /usr/local/bin/ && sudo cp /usr/local/bin/apps-gui /usr/lo
 sudo chmod +x /usr/local/bin/glitch-toolkit-gui.py
 sudo chmod +x /usr/local/bin/apps && sudo chmod +x /usr/local/bin/apps-gui
 
-echo '#!/bin/bash' > /usr/local/bin/apps-cli-restore
-echo "sudo cp /usr/local/bin/apps-cli /usr/local/bin/apps" >> /usr/local/bin/apps-cli-restore
-echo "echo '"apps" shortcut restored to cli toolkit'" >> /usr/local/bin/apps-cli-restore
+echo '#!/bin/bash' > /tmp/apps-cli-restore
+echo "sudo cp /usr/local/bin/apps-cli /usr/local/bin/apps" >> /tmp/apps-cli-restore
+echo "echo '"apps" shortcut restored to CLI toolkit'" >> /tmp/apps-cli-restore
+sudo cp /tmp/apps-cli-restore /usr/local/bin/apps-cli-restore
 sudo chmod +x /usr/local/bin/apps-cli-restore
 
-echo '#!/bin/bash' > /usr/local/bin/apps-gui-restore
-echo "sudo cp /usr/local/bin/apps-gui /usr/local/bin/apps" >> /usr/local/bin/apps-gui-restore
-echo "echo '"apps" shortcut restored to gui toolkit'" >> /usr/local/bin/apps-gui-restore
+echo '#!/bin/bash' > /tmp/apps-gui-restore
+echo "sudo cp /usr/local/bin/apps-gui /usr/local/bin/apps" >> /tmp/apps-gui-restore
+echo "echo '"apps" shortcut restored to GUI toolkit'" >> /tmp/apps-gui-restore
+sudo cp /tmp/apps-gui-restore /usr/local/bin/apps-gui-restore
 sudo chmod +x /usr/local/bin/apps-gui-restore
 
 echo "Glitch CLI-tookit changed to 'apps-cli' shortcut"
 
 echo "Glitch GUI-toolkit can now be launched with 'apps' & 'apps-gui' commands"
 
-echo "To Change 'apps' shortcut to execute CLI toolkit run 'apps-cli-restore'"
+echo "To Change back 'apps' shortcut to execute CLI toolkit run 'apps-cli-restore'"
 echo "OR change back 'apps' shortcut to execute GUI toolkit with 'apps-gui-restore'"
-
 
 
 
