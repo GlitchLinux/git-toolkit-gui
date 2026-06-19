@@ -3,7 +3,7 @@
 sudo cp -f /usr/local/bin/apps /usr/local/bin/apps-cli
 
 cd /tmp && wget https://raw.githubusercontent.com/GlitchLinux/git-toolkit-gui/refs/heads/main/glitch-toolkit-gui.py
-sudo mv glitch-toolkit-gui.py /usr/local/bin/glitch-toolkit-gui.py
+sudo cp glitch-toolkit-gui.py /usr/local/bin/glitch-toolkit-gui.py
 wget https://raw.githubusercontent.com/GlitchLinux/git-toolkit-gui/refs/heads/main/toolkit-launcher.sh
 sudo cp toolkit-launcher.sh /usr/local/bin/toolkit-launcher.sh
 
